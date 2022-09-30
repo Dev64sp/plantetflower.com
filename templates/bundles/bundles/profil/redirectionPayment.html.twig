@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+	{{ encore_entry_link_tags("app") }}
+	{{ encore_entry_link_tags("redirectionPayment") }}
+{% endblock %}
+
+{% block javascripts %}
+  {{ encore_entry_script_tags("app") }}
+  {{ encore_entry_script_tags("redirectionPayment") }}
+{% endblock %}
+
+{% block body %}
+  <div class="redirection-content">
+    <h1>Redirection...</h1>
+    <div class="loader-container">
+      <div class="dot d1"></div>
+      <div class="dot d2"></div>
+      <div class="dot d3"></div>
+    </div>
+
+    <br>
+    <p>
+      Si la page ne se redirige pas, je vous prie de vous diriger vers la
+      <a href={{ path('app_homepage') }}>page d'Accueil</a>
+    </p>
+    {# <a href=" https://www.mondialrelay.com{{ etiquette }}">Cliquez ici pour obtenir l'étiquette Mondial Relay</a> #}
+  </div>
+{% endblock %}

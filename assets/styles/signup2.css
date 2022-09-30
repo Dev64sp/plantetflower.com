@@ -1,0 +1,36 @@
+.bloc {
+  margin: 30px auto;
+  border: 1px solid #c4c4c4;
+  border-radius: 30px;
+  /* width: 800px; */
+  height: 450px;
+  text-align: center;
+  font-family: "ABeeZee", sans-serif;
+  width: 55%;
+  max-width: 600px;
+  min-width: 180px;
+}
+.all {
+  text-align: center;
+  padding-top: 60px;
+}
+
+.all img {
+  padding-top: 20px;
+  width: 50%;
+  max-width: 500px;
+  min-width: 160px;
+}
+h1 {
+  color: #48945d;
+  font-family: "ABeeZee", sans-serif;
+  font-size: 20px;
+}
+p {
+  color: #d1d1d1;
+  font-family: "ABeeZee", sans-serif;
+  padding-top: 50px;
+}
+
+
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2lnbnVwMi5jc3MiLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxpQkFBaUI7RUFDakIseUJBQXlCO0VBQ3pCLG1CQUFtQjtFQUNuQixrQkFBa0I7RUFDbEIsYUFBYTtFQUNiLGtCQUFrQjtFQUNsQixrQ0FBa0M7RUFDbEMsVUFBVTtFQUNWLGdCQUFnQjtFQUNoQixnQkFBZ0I7QUFDbEI7QUFDQTtFQUNFLGtCQUFrQjtFQUNsQixpQkFBaUI7QUFDbkI7O0FBRUE7RUFDRSxpQkFBaUI7RUFDakIsVUFBVTtFQUNWLGdCQUFnQjtFQUNoQixnQkFBZ0I7QUFDbEI7QUFDQTtFQUNFLGNBQWM7RUFDZCxrQ0FBa0M7RUFDbEMsZUFBZTtBQUNqQjtBQUNBO0VBQ0UsY0FBYztFQUNkLGtDQUFrQztFQUNsQyxpQkFBaUI7QUFDbkIiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9hc3NldHMvc3R5bGVzL3NpZ251cDIuY3NzIl0sInNvdXJjZXNDb250ZW50IjpbIi5ibG9jIHtcbiAgbWFyZ2luOiAzMHB4IGF1dG87XG4gIGJvcmRlcjogMXB4IHNvbGlkICNjNGM0YzQ7XG4gIGJvcmRlci1yYWRpdXM6IDMwcHg7XG4gIC8qIHdpZHRoOiA4MDBweDsgKi9cbiAgaGVpZ2h0OiA0NTBweDtcbiAgdGV4dC1hbGlnbjogY2VudGVyO1xuICBmb250LWZhbWlseTogXCJBQmVlWmVlXCIsIHNhbnMtc2VyaWY7XG4gIHdpZHRoOiA1NSU7XG4gIG1heC13aWR0aDogNjAwcHg7XG4gIG1pbi13aWR0aDogMTgwcHg7XG59XG4uYWxsIHtcbiAgdGV4dC1hbGlnbjogY2VudGVyO1xuICBwYWRkaW5nLXRvcDogNjBweDtcbn1cblxuLmFsbCBpbWcge1xuICBwYWRkaW5nLXRvcDogMjBweDtcbiAgd2lkdGg6IDUwJTtcbiAgbWF4LXdpZHRoOiA1MDBweDtcbiAgbWluLXdpZHRoOiAxNjBweDtcbn1cbmgxIHtcbiAgY29sb3I6ICM0ODk0NWQ7XG4gIGZvbnQtZmFtaWx5OiBcIkFCZWVaZWVcIiwgc2Fucy1zZXJpZjtcbiAgZm9udC1zaXplOiAyMHB4O1xufVxucCB7XG4gIGNvbG9yOiAjZDFkMWQxO1xuICBmb250LWZhbWlseTogXCJBQmVlWmVlXCIsIHNhbnMtc2VyaWY7XG4gIHBhZGRpbmctdG9wOiA1MHB4O1xufVxuIl0sIm5hbWVzIjpbXSwic291cmNlUm9vdCI6IiJ9*/

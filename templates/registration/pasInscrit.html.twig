@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vous n'êtes pas inscrit - Plant&Flower{% endblock %}
+
+	{% block javascripts %}
+		{{ encore_entry_script_tags("app") }}
+	{% endblock %}
+    
+{% block stylesheets %}
+	{{ encore_entry_link_tags('app') }}
+	{{ encore_entry_link_tags('verify') }}
+{% endblock %}
+
+{% block body %}
+    <div class="bodyMail">
+        <h1 class="titreInscription"> Inscrivez-vous </h1>
+        <div class="textInscription">
+            <p class="mailInlineInscription">Vous avez essayé de vous connecter avec cette adresse email : {{ mail }}</p>
+        </div>
+        <div class="contain-img">
+            <img class="felicitation" src="../img/welcome-illustration.png" alt="Inscrivez-vous">
+        </div>
+        <div class="textInscription">
+            <p class="mailInlineInscription">Vous n'êtes pas enregistré sur notre site. <br>
+            Pour pouvoir vous connecter et commencer à utiliser notre site.</p>
+            <a class="btn-connectMail" href={{ path('app_register') }}>veuillez vous inscrire !</a>
+        </div>
+    </div>
+{% endblock %}

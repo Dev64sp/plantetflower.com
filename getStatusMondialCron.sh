@@ -1,0 +1,1 @@
+php /var/www/NEWPLANTE-2/bin/console app:mondial:statut

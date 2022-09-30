@@ -1,0 +1,41 @@
+{% block body %}
+{% apply inline_css(source('@styles/verify.css')) %}
+
+    <div class="containerMail">
+        <div class="headMail">
+
+        </div>
+        <div class="bodyMail">
+            <div class="contain-imgMail">
+                <div class="divLogoMail">
+                    <img class="logoMail" src="{{ email.image('@images/Logo_plants.png') }}"/>
+                </div>
+                <div class="felicitation">
+                    <div class"textFelicitation">
+                        <h1 class="bienvenue">Félicitations {{ username }}!</h1>
+                        <p class="mailInline">Votre plante de l'annonce {{ title }} a été achetée</p>
+                    </div>
+                    <img class="felicitationImg" src="{{ email.image('@images/welcome-illustration.png') }}" alt="Félicitation">
+                </div>
+            </div>
+            <div class="textMail">
+                <p class="mailInline">Votre étiquette d'expédition est disponible dans votre espace vendeur.<br>Vous pouvez également la télécharger en cliquant sur le QR code ci-dessous ou en le scannant.</p>
+                <p>La transaction sera validée à la réception du colis par votre acheteur.</p>
+            </div>
+            <div class="btnMail">
+                <a class="mailInline load" href="{{ etiquette }}">Télécharger votre étiquette.</a>
+                <a href="http://127.0.0.1:8000/order-confirmation/{{ expNumber }}">Confirmer la commande et télécharger votre étiquette</a>
+                <a class="mailInline" href="{{ etiquette }}"><img src="{{ qr_code_data_uri(etiquette, 'custom') }}" /></a>
+            </div>
+        </div>
+        <div class="footerMail">
+				<p class="mailInline">Echanger vos végétaux préférés partout en france</p>
+				<div class="iconsMail">
+					<a href="https://www.facebook.com/Plantetflower-110812368257334/"><img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Page Facebook de Plant&Flower"/></a>
+					<a href="https://www.instagram.com/plantetflower/"><img src="https://img.icons8.com/fluency/48/000000/instagram-new.png" alt="Page Instagram de Plant&Flower"/></a>
+				</div>
+				<p class="mailInline" style="font-size: 11px">© 2021-2022 Tous droits réservés — PLANT&FLOWER.COM</p>
+        </div>
+    </div>
+{% endapply %}
+{% endblock %}

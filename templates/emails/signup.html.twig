@@ -1,0 +1,38 @@
+
+{% block body %}
+{% apply inline_css(source('@styles/verify.css')) %}
+    <div class="containerMail">
+        <div class="headMail">
+
+        </div>
+        <div class="bodyMail">
+            <div class="contain-imgMail">
+            <div class="divLogoMail">
+                <img class="logoMail" src="{{ email.image('@images/Logo_plants.png') }}"/>
+            </div>
+            <h1 class="bienvenue">Bienvenue {{ username }}!</h1>
+                <p class="mailInline">Nous sommes heureux de vous accueillir parmi nous</p>
+                <img class="felicitationImg" src="{{ email.image('@images/welcome-illustration.png') }}" alt="Fécilitation">
+            </div>
+            <div class="textMail">
+                <p class="mailInline">Cliquez sur le bouton ci-dessous afin de valider votre inscription</p>
+            </div>
+            <div class="btnMail">
+                <a class="btn-connectMail mailInline" href="{{ message }}">Vérifiez votre adresse mail</a>
+            </div>
+            <div class="lien">
+                <p class="lienValid">(Ce lien est valide jusqu'au : {{ expiration_date|format_datetime(locale='fr') }})</p>
+  
+            </div>
+        </div>
+        <div class="footerMail">
+				<p class="mailInline">Echanger vos végétaux préférés partout en france</p>
+				<div class="iconsMail">
+					<a href="https://www.facebook.com/Plantetflower-110812368257334/"><img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Page Facebook de Plant&Flower"/></a>
+					<a href="https://www.instagram.com/plantetflower/"><img src="https://img.icons8.com/fluency/48/000000/instagram-new.png" alt="Page Instagram de Plant&Flower"/></a>
+				</div>
+				<p class="mailInline" style="font-size: 11px">© 2021-2022 Tous droits réservés — PLANT&FLOWER.COM</p>
+        </div>
+    </div>
+{% endapply %}
+{% endblock %}

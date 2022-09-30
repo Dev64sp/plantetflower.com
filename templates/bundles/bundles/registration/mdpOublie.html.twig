@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mot de passe oublié? - Plant&Flower{% endblock %}
+	{% block javascripts %}
+		{{ encore_entry_script_tags("app") }}
+	{% endblock %}
+{% block stylesheets %}
+	{{ encore_entry_link_tags('app') }}
+    {{ encore_entry_link_tags("login") }} 
+{% endblock %}
+
+{% block body %}
+<div class="contain">
+    <div class="password-forgot">
+        <h5>Entrer votre email pour recevoir le mail de réinitialisation</h5>
+        
+        {{ form_start(ForgotPasswordform) }}
+        
+        <div class="Email">
+            {{ form_row(ForgotPasswordform.email.first, {
+                'label': false,
+                'attr': {
+                    class: 'input-email'
+                }
+            }) }}
+        </div>
+
+        <div class="Email">
+            {{ form_row(ForgotPasswordform.email.second, {
+                'label': false,
+                'attr': {
+                    class: 'input-email'
+                }
+            }) }} 
+        </div>
+           
+        <button class="ok" type="submit">Valider</button>
+      
+
+        {% for message in app.flashes('danger') %}
+        <div class="flash-info">
+            {{ message }}
+        </div>
+        {% endfor %}
+  
+
+        {{form_end(ForgotPasswordform)}}
+    </div>
+</div>
+
+{% endblock %}
