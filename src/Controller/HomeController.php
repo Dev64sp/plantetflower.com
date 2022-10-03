@@ -215,7 +215,7 @@ class HomeController extends AbstractController
             // creation du mail
         $email = (new TemplatedEmail())
         ->from($mail)
-        -> to('plantetflower@gmail.com')
+        -> to('dev64splatoon@gmail.com')
   
         //->cc('cc@example.com')
         ->bcc('dev64splatoon@gmail.com')

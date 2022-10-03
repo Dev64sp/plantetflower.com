@@ -276,25 +276,20 @@ class ProfilController extends AbstractController
         $this->addFlash('error', 'Vous ne pouvez pas acheter votre propre annonce');
         return $this->redirectToRoute('profil');
       }
-      $BuyerId = $Buyer->getIdMangopay();
-
       $form = $this->createForm(RegistrationCard::class);
       $form->handleRequest($request); 
 
       if($form->isSubmitted() && $form->isValid()) {  
         // Verification que la carte existe 
-        $Card = $ApiUser->GetCardByNumber($BuyerId, $form['cardNumber']->getData());
         $shipment = $form['parcelshopAddress']->getData();
-        
+        $BuyerId = $Buyer->getIdMangopay();
               // si shipment on peut proposer la livraison mondial relay et creer une etiquette
 
         if ($shipment) {
         $etiquette = $ApiMondial->createEtiquette($security, $annonce, $form['parcelshopAddress']->getData(), $form['parcelshopId']->getData());
-        if($Card) {
           return $this->redirectToRoute('redirection_payment', [
             // card === true ça signifie que la carte existe déjà sur le compte de MangoPay
             'card' => true,
-            'cardId' => $Card['Id'],
             'annonceId' => $annonce->getId(),
             'annoncePriceTotal' => $annonce->getPriceTotal(),
             'annoncePriceOrigin' => $annonce->getPriceOrigin(),
@@ -303,205 +298,19 @@ class ProfilController extends AbstractController
             'annoncePoids' => $annonce->getPoids(),
             'ship'=> true,
           ]);
-        } else if ($Card === false){
-          // Si la carte n'existe pas, il commence l'enregistration de la carte et la passe 
-          // à l'étape suivante
-          $Registration = $ApiUser->Registration($BuyerId);
-          $response = $ApiUser->Data($Registration, $form);
-          $content = $response->getContent();
-
-          if (str_contains($content, 'errorCode=')) {
-            $code = preg_replace('/[^0-9]/', '', $content);
-            return  $this->redirectToRoute('errors', [
-              'ResultCode' =>  $code,
-            ]);
-          }
-
-          return $this->redirectToRoute('redirection_payment', [
-            // card === false ça signifie que la carte est en train d'etre créée
-            'card' => false,
-            'cardRegId' => $Registration->Id,
-            'registrationData' => $content,
-            'annoncePriceOrigin' => $annonce->getPriceOrigin(),
-            'annoncePriceTotal' => $annonce->getPriceTotal(),
-            'annonceId' => $annonce->getId(),
-            'etiquette' => $etiquette,
-            'annoncePoids' => $annonce->getPoids(),
-            'ship'=> true,
-          ]);
-        }
-      } else {
-        if($Card) {
-          return $this->redirectToRoute('redirection_payment', [
-            // card === true ça signifie que la carte existe déjà sur le compte de MangoPay
-            'card' => true,
-            'cardId' => $Card['Id'],
-            'annonceId' => $annonce->getId(),
-            'annoncePriceTotal' => $annonce->getPriceTotal(),
-            'annoncePriceOrigin' => $annonce->getPriceOrigin(),
-            'buyerId' => $BuyerId,
-            'annoncePoids' => $annonce->getPoids(),
-            'ship'=> false,
-          ]);
-        } else if ($Card === false){
-          // Si la carte n'existe pas, il commence l'enregistration de la carte et la passe 
-          // à l'étape suivante
-          $Registration = $ApiUser->Registration($BuyerId);
-          $response = $ApiUser->Data($Registration, $form);
-          $content = $response->getContent();
-
-          if (str_contains($content, 'errorCode=')) {
-            $code = preg_replace('/[^0-9]/', '', $content);
-            return  $this->redirectToRoute('errors', [
-              'ResultCode' =>  $code,
-            ]);
-          }
-
-          return $this->redirectToRoute('redirection_payment', [
-            // card === false ça signifie que la carte est en train d'etre créée
-            'card' => false,
-            'cardRegId' => $Registration->Id,
-            'registrationData' => $content,
-            'annoncePriceOrigin' => $annonce->getPriceOrigin(),
-            'annoncePriceTotal' => $annonce->getPriceTotal(),
-            'annonceId' => $annonce->getId(),
-            'annoncePoids' => $annonce->getPoids(),
-            'ship'=> false,
-          ]);
-        }
-      }
-      } 
-    } else {
-      $form = $this->createForm(PaymentNotRegistered::class);
-      $form->handleRequest($request);
-      
-      if($form->isSubmitted() && $form->isValid()) {
-        $User = $ApiUser->GetUserByEmail($form['email']->getData());
-        // Si l'utilisateur n'est pas enregistré dans le site, il faut verifier si, dans le site 
-        // de MangoPay, l'utilisateur (le mail répéré depuis le formulaire) existe dans notre
-        // Dashboard et l'utiliser
-        if($User) {
-          $Wallet = $ApiWallet->GetWallet($User['Id']);
-          $form = $this->createForm(RegistrationCard::class);
-          $form->handleRequest($request); 
-          $shipment = $form['parcelshopAddress']->getData();
-          $Card = $ApiUser->GetCardByNumber($User['Id'], $form['cardNumber']->getData());
-
-              // si shipment on peut proposer la livraison mondial relay et creer une etiquette
-          if ($shipment) { 
-          $etiquette = $ApiMondial->createEtiquette($security, $annonce, $form['parcelshopAddress']->getData(), $form['parcelshopId']->getData());
-          // Verification de la carte
-          if($Card) {
-            return $this->redirectToRoute('redirection_payment', [
-              // card === true ça signifie que la carte existe déjà sur le compte de MangoPay
-              'card' => true,
-              'cardId' => $Card['Id'],
-              'annonceId' => $annonce->getId(),
-              'annoncePriceTotal' => $annonce->getPriceTotal(),
-              'annoncePriceOrigin' => $annonce->getPriceOrigin(),
-              'buyerId' => $User['Id'],
-              'walletId' => $Wallet['Id'],
-              'etiquette' => $etiquette,
-              'annoncePoids' => $annonce->getPoids(),
-              
-            ]);
-          } else if($Card === false) {
-            $Registration = $ApiUser->Registration($User['Id']);
-            $response = $ApiUser->Data($Registration, $form);
-            $content = $response->getContent();
-            
-            if (str_contains($content, 'errorCode=')) {
-              $code = preg_replace('/[^0-9]/', '', $content);
-              return  $this->redirectToRoute('errors', [
-                'ResultCode' =>  $code,
-              ]);
-            }
-
-            return $this->redirectToRoute('redirection_payment', [
-              // card === false ça signifie que la carte est en train d'etre créée
-              'card' => false,
-              'cardRegId' => $Registration->Id,
-              'registrationData' => $content,
-              'annonceId' => $annonce->getId(),
-              'annoncePriceTotal' => $annonce->getPriceTotal(),
-              'annoncePriceOrigin' => $annonce->getPriceOrigin(),
-              'buyerId' => $User['Id'],
-              'walletId' => $Wallet['Id'],
-              'etiquette' => $etiquette,
-              'annoncePoids' => $annonce->getPoids(),
-             
-            ]);
-          }  else {
-            if($Card) {
-              return $this->redirectToRoute('redirection_payment', [
-                // card === true ça signifie que la carte existe déjà sur le compte de MangoPay
-                'card' => true,
-                'cardId' => $Card['Id'],
-                'annonceId' => $annonce->getId(),
-                'annoncePriceTotal' => $annonce->getPriceTotal(),
-                'annoncePriceOrigin' => $annonce->getPriceOrigin(),
-                'buyerId' => $BuyerId,
-                'annoncePoids' => $annonce->getPoids(),
-                
-              ]);
-            } else if ($Card === false){
-              // Si la carte n'existe pas, il commence l'enregistration de la carte et la passe 
-              // à l'étape suivante
-              $Registration = $ApiUser->Registration($BuyerId);
-              $response = $ApiUser->Data($Registration, $form);
-              $content = $response->getContent();
-    
-              if (str_contains($content, 'errorCode=')) {
-                $code = preg_replace('/[^0-9]/', '', $content);
-                return  $this->redirectToRoute('errors', [
-                  'ResultCode' =>  $code,
-                ]);
-              }
-    
-              return $this->redirectToRoute('redirection_payment', [
-                // card === false ça signifie que la carte est en train d'etre créée
-                'card' => false,
-                'cardRegId' => $Registration->Id,
-                'registrationData' => $content,
-                'annoncePriceOrigin' => $annonce->getPriceOrigin(),
-                'annoncePriceTotal' => $annonce->getPriceTotal(),
-                'annonceId' => $annonce->getId(),
-                'annoncePoids' => $annonce->getPoids(),
-                
-              ]);
-            }
-          }
-        }
         } else {
-          // En cas que l'utilisateur (de MangoPay) n'existe pas, il faut en créer un
-          $ProfilMango = $ApiUser->NewProfil($form);
-          $Wallet = $ApiWallet->NewWallet($ProfilMango->Id);
-          $Registration = $ApiUser->Registration($ProfilMango->Id);
-          
-          $response = $ApiUser->Data($Registration, $form);
-          $content = $response->getContent();
-          if (str_contains($content, 'errorCode=')) {
-            $code = preg_replace('/[^0-9]/', '', $content);
-            return  $this->redirectToRoute('errors', [
-              'ResultCode' =>  $code,
-            ]);
-          }
-
           return $this->redirectToRoute('redirection_payment', [
-            // card === false ça signifie que la carte est en train d'etre créée
-            'card' => false,
-            'cardRegId' => $Registration->Id,
-            'registrationData' => $content,
-            'annoncePriceOrigin' => $annonce->getPriceOrigin(),
-            'annoncePriceTotal' => $annonce->getPriceTotal(),
+            // card === true ça signifie que la carte existe déjà sur le compte de MangoPay
+            'card' => true,
             'annonceId' => $annonce->getId(),
-            'buyerId' => $ProfilMango->Id,
-            'walletId' => $Wallet->Id,
+            'annoncePriceTotal' => $annonce->getPriceTotal(),
+            'annoncePriceOrigin' => $annonce->getPriceOrigin(),
+            'buyerId' => $BuyerId,
             'annoncePoids' => $annonce->getPoids(),
-           
+            'ship'=> true,
           ]);
         }
-      }
+      } 
     }
     
     return $this->render('home/payment.html.twig', [
@@ -517,167 +326,20 @@ class ProfilController extends AbstractController
   /**
    * @Route("/redirection-payment", name="redirection_payment")
    */
-  public function redirectionPayment(ApiUser $ApiUser, ApiWallet $ApiWallet, ApiPayIn $ApiPayIn, ApiPayOut $ApiPayOut, ApiIban $ApiIban, Request $request, MailerInterface $mailer, TokenGeneratorInterface $tokenGenerator): Response
+  public function redirectionPayment(ApiUser $ApiUser,  Request $request, MailerInterface $mailer, TokenGeneratorInterface $tokenGenerator): Response
   {
     // Verifier que l'utilisateur existe pour pouvoir transmettre les bonnes données dans tous 
     // les cas
-    if($this->getUser()) {
-      $Buyer = $this->getUser();
-      $BuyerIdMango = $Buyer->getIdMangoPay();
-      $BuyerWallet = $ApiWallet->getWallet($BuyerIdMango);
-      $BuyerWalletId = $BuyerWallet['Id'];
-    } else {
-      $BuyerIdMango = $_GET['buyerId'];
-      $BuyerWalletId = $_GET['walletId'];
-      $Buyer = $ApiUser->GetUserById($_GET['buyerId']);
-    }
+    $Buyer = $this->getUser();
+    $BuyerIdMango = $_GET['buyerId'];
     // Prendre tous les infos nécéssaire pour faire les differents actions pour le payement
     $annonce = $this->annonceRepository->find($_GET['annonceId']);
     $user = $this->managerRegistry->getRepository(User::class)->findAll();
     $shipment = $_GET['ship'];
     $SellerId = $annonce->getUser()->getIdMangoPay();
-    $SellerWallet = $ApiWallet->getWallet($SellerId);
-    $SellerBankAccount = $ApiIban->GetLastBankAccount($SellerId);
 
-    // Verifier si la carte existait déjà ou c'est le première étape pour créer la carte
-    // Si la carte est au premier étape, il faut la créer et faire les actions de payement
-    if($_GET['card'] == false) {
-      $registrationCard = $ApiUser->RegistrationCard($_GET['cardRegId'], $_GET['registrationData']);
-     
-      // Verifier si l'enregistrement a eu des erreurs
-      if($registrationCard->Status === 'ERROR') {
-        return $this->redirectToRoute('errors', [
-          'ResultCode' => $registrationCard->ResultCode,
-        ]);
-      } else {
-      // Si l'enregistrement n'a pas eu d'êtats d'erreur, alors on procède avec le payement
-        // Le PayIn est l'ajoute de l'argent au "portefeuille" d'utilisateur MangoPay
-        // Le PayOut est le prelevement de l'argent de "portefeuille" à utilisateur MangoPay
-        $PayIn = $ApiPayIn->PayIn($BuyerWalletId, $BuyerIdMango, $_GET['annoncePoids'], $shipment, $registrationCard->CardId, $_GET['annoncePriceOrigin'], false);
-      
-        // Si le payin donne de code d'erreur alors il me derigera sur la page des erreurs en donnant le numero du code
-        if($PayIn->Status === "FAILED") {
-          return $this->redirectToRoute('errors', [
-            'ResultCode' => $PayIn->ResultCode
-          ]);
-        } else if($PayIn->Status === "SUCCEEDED") {
-        // Si le PayIn a succès alors il faut changer l'êtat de l'annonce en question de "pas vendu"
-        // à "vendu" et ajouter les informations de l'annonce chez chaque acteur
-          // $Transfer = $ApiPayOut->Transfer($BuyerIdMango, $SellerId, $BuyerWalletId, $SellerWallet['Id'], $_GET["annoncePriceOrigin"]);
+      if ($_GET['card'] == 1) {
 
-          // if($Transfer->Status === "ERROR"){
-          //   return $this->redirectToRoute('errors', [
-          //     'ResultCode' => $Transfer->ResultCode
-          //   ]);
-          // } else if($Transfer->Status === "SUCCEEDED") {
-          //   $PayOut = $ApiPayOut->PayOut($SellerId, $SellerWallet['Id'], $SellerBankAccount['Id'], $_GET['annoncePriceOrigin']);
-
-          //   if($PayOut->Status === "ERROR") {
-          //     return $this->redirectToRoute('errors', [
-          //       'ResultCode' => $PayOut->ResultCode
-          //     ]);
-          //   } else if($PayOut->Status === "CREATED") {
-              $annonce->setSold(true);
-              $annonce->setAcheteur($BuyerIdMango);
-              $this->entityManager->persist($annonce);
-              $this->entityManager->flush();
-              $Seller = $annonce->getUser();
-
-              // Verifier quelle clé a le nom complet du vendeur
-              if(empty($Seller->getFullName())){
-                $SellerFullName = $Seller->getFirstName() . ' ' . $Seller->getLastName();
-              } else {
-                $SellerFullName = $Seller->getFullName();
-              }
-              
-              // Verifier que l'utiisateur soit connecté
-              if($this->getUser()) {
-                // Verifier quelle clé a le nom complet du acheteur
-                if(empty($Buyer->getFullName())) {
-                  $BuyerFullName = $Buyer->getFirstName() . ' ' . $Buyer->getLastName();
-                } else {
-                  $BuyerFullName = $Buyer->getFullName();
-                }
-      
-                $Purchase = [
-                  'title' => $annonce->getTitle(),
-                  'price' => $_GET['annoncePriceTotal'],
-                  'paymentDate' => date('d/m/Y'),
-                  'seller' => $SellerFullName,
-                  'buyer' => $BuyerFullName,
-                  'etiquette' => $annonce->getEtiquetteURL(),
-                  'tracing' => $annonce->getTracingURL(),
-                  'expNumber' => $annonce->getExpNumber(),
-                ];
-                
-                $Purchases = $Buyer->getMyPurchases();
-                $Purchases[] = $Purchase;
-    
-                $Buyer->setMyPurchases($Purchases);
-    
-                $Sale = [
-                  'title' => $annonce->getTitle(),
-                  'price' => $_GET['annoncePriceTotal'],
-                  'paymentDate' => date('d/m/Y'),
-                  'seller' => $SellerFullName,
-                  'buyer' => $BuyerFullName,
-                  'etiquette' => $annonce->getEtiquetteURL(),
-                  'tracing' => $annonce->getTracingURL(),
-                  'expNumber' => $annonce->getExpNumber(),
-                ];
-                $Sales = $Seller->getMySales();
-                $Sales[] = $Sale;
-    
-                $Seller->setMySales($Sales);
-                $this->entityManager->persist($Buyer);
-                $this->entityManager->persist($Seller);
-                $this->entityManager->flush();
-              } else {
-                $mySale = [
-                  'title' => $annonce->getTitle(),
-                  'price' => $_GET['annoncePriceTotal'],
-                  'paymentDate' => date('d/m/Y'),
-                  'seller' => $SellerFullName,
-                  'buyer' => $Buyer['Name'],
-                  'etiquette' => $annonce->getEtiquetteURL(),
-                  'tracing' => $annonce->getTracingURL(),
-                  'expNumber' => $annonce->getExpNumber(),
-                ];
-      
-                $Sales = $Seller->getMySales();
-                $Sales[] = $Sale;
-    
-                $Seller->setMySales($Sales);
-                $this->entityManager->persist($Seller);
-                $this->entityManager->flush();
-                
-                return $this->redirectToRoute('app_homepage');
-              }
-          // }
-          // }
-        }
-      } 
-    } else if ($_GET['card'] == 1) {
-      $PayIn = $ApiPayIn->PayIn($BuyerWalletId, $BuyerIdMango,  $_GET['annoncePoids'], $shipment,$_GET['cardId'], $_GET['annoncePriceOrigin'], true);
-       //dd($PayIn);
-
-      if($PayIn->Status === "FAILED") {
-        return $this->redirectToRoute('errors', [
-          'ResultCode' => $PayIn->ResultCode
-        ]);
-      } else if($PayIn->Status === "SUCCEEDED") {
-        // $Transfer = $ApiPayOut->Transfer($BuyerIdMango, $SellerId, $BuyerWalletId, $SellerWallet['Id'], $_GET["annoncePriceOrigin"]);
-        // if($Transfer->Status === "ERROR"){
-        //   return $this->redirectToRoute('errors', [
-        //     'ResultCode' => $Transfer->ResultCode
-        //   ]);
-        // } else if($Transfer->Status === "SUCCEEDED") {
-        //   $PayOut = $ApiPayOut->PayOut($SellerId, $SellerWallet['Id'], $SellerBankAccount['Id'], $_GET['annoncePriceOrigin']);
-        //   if($PayOut->Status === "ERROR") {
-        //     return $this->redirectToRoute('errors', [
-        //       'ResultCode' => $PayOut->ResultCode
-        //     ]);
-        //   } else if($PayOut->Status === "CREATED") {
             $annonce->setSold(true);
             $annonce->setAcheteur($BuyerIdMango);
             $this->entityManager->persist($annonce);
@@ -689,14 +351,11 @@ class ProfilController extends AbstractController
             } else {
               $SellerFullName = $Seller->getFullName();
             }
-            
-            if($this->getUser()) {
-              if(empty($Buyer->getFullName())){
-                $BuyerFullName = $Buyer->getFirstName() . ' ' . $Buyer->getLastName();
-              } else {
-                $BuyerFullName = $Buyer->getFullName();
-              }
-      
+            if(empty($Buyer->getFullName())) {
+              $BuyerFullName = $Buyer->getFirstName() . ' ' . $Buyer->getLastName();
+            } else {
+              $BuyerFullName = $Buyer->getFullName();
+            }
               $Purchase = [
                 'title' => $annonce->getTitle(),
                 'price' => $_GET['annoncePriceTotal'],
@@ -731,31 +390,7 @@ class ProfilController extends AbstractController
               $this->entityManager->persist($Buyer);
               $this->entityManager->persist($Seller);
               $this->entityManager->flush();
-            } else {
-              $Sale = [
-                'title' => $annonce->getTitle(),
-                'price' => $_GET['annoncePriceTotal'],
-                'paymentDate' => date('d/m/Y'),
-                'seller' => $SellerFullName,
-                'buyer' => $Buyer['Name'],
-                'etiquette' => $annonce->getEtiquetteURL(),
-                'tracing' => $annonce->getTracingURL(),
-                'expNumber' => $annonce->getExpNumber(),
-              ];
-      
-              $Sales = $Seller->getMySales();
-              $Sales[] = $Sale;
-
-              $Seller->setMySales($Sales);
-              $this->entityManager->persist($Buyer);
-              $this->entityManager->persist($Seller);
-              $this->entityManager->flush();
-
-              return $this->redirectToRoute('app_homepage');
-            }
-          //  }
-        //  }
-      } 
+           
     }
     if ($annonce->getEtiquetteURL() !== null)
     {
@@ -763,8 +398,8 @@ class ProfilController extends AbstractController
             // Mail du lien etiquette mondial relay envoyer au vendeur
 
       $email = (new TemplatedEmail())
-        ->from('plantetflower@gmail.com')
-        ->to($annonce->getUser()->getEmail())
+        ->from('dev64splatoon@gmail.com')
+        ->to('dev64splatoon@gmail.com')
         //->cc('dev64splatoon@gmail.com')
         //->bcc('bcc@example.com')
         //->replyTo('fabien@example.com')
@@ -788,8 +423,8 @@ class ProfilController extends AbstractController
             // Mail du lien tracing mondial relay envoyer à l'acheteur
 
         $email = (new TemplatedEmail())
-        ->from('plantetflower@gmail.com')
-        ->to($annonce->getUser()->getEmail())
+        ->from('dev64splatoon@gmail.com')
+        ->to('dev64splatoon@gmail.com')
         //->bcc('bcc@example.com')
         //->replyTo('fabien@example.com')
         //->priority(Email::PRIORITY_HIGH)
@@ -816,8 +451,8 @@ class ProfilController extends AbstractController
             // Mail remise en main propre envoyer au vendeur
 
       $email = (new TemplatedEmail())
-        ->from('plantetflower@gmail.com')
-        ->to($annonce->getUser()->getEmail())
+        ->from('dev64splatoon@gmail.com')
+        ->to('dev64splatoon@gmail.com')
         //->cc('cc@example.com')
         //->bcc('bcc@example.com')
         //->replyTo('fabien@example.com')
@@ -843,8 +478,8 @@ class ProfilController extends AbstractController
         $this->entityManager->flush();
         
         $email = (new TemplatedEmail())
-        ->from('plantetflower@gmail.com')
-        ->to($this->getUser()->getEmail())
+        ->from('dev64splatoon@gmail.com')
+        ->to('dev64splatoon@gmail.com')
         //->cc('cc@example.com')
         //->bcc('bcc@example.com')
         //->replyTo('fabien@example.com')

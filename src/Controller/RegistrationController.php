@@ -90,9 +90,9 @@ class RegistrationController extends AbstractController
 
           // creation du mail
       $email = (new TemplatedEmail())
-      ->from('plantetflower@gmail.com')
-      // ->to('dev64splatoon@gmail.com')
-      ->to($form->get('email')->getData())
+      ->from('dev64splatoon@gmail.com')
+      ->to('dev64splatoon@gmail.com')
+      // ->to($form->get('email')->getData())
 
       //->cc('cc@example.com')
       //->bcc('bcc@example.com')
