@@ -704,15 +704,14 @@ a {
 }
 
 .not-livraison {
-    display: flex;
     font-family: 'Open Sans', sans-serif;
     font-size: 1.5vh;
     background-color: white;
     border-radius: 5px;
     padding: 2px 5px;
     align-items: center;
-    margin-bottom: 10px;
     width: 80%;
+    margin: 0px auto;
 }
 
 .livraison {
@@ -723,8 +722,7 @@ a {
     width: 90%;
     background-color: #fff56e;
     color: green;
-    margin-left: 8px;
-    margin-top: 0px;
+    margin: 0px auto;
     text-align: center;
 }
 
